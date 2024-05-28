@@ -2,43 +2,55 @@ import pygame
 from pygame.locals import *
 from PIL import Image, ImageDraw
 
-SCREEN_WIDTH = 400
-SCREEN_HEIGHT = 400
-
-BOARD_SIZE = 3
-CELL_SIZE = SCREEN_WIDTH // BOARD_SIZE
-
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
-pygame.init()
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Tic Tac Toe")
+class Board:
+    def __init__(self, screen_width, screen_height, board_size, cell_size):
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+        self.board_size = board_size
+        self.cell_size = cell_size
 
-def draw_board():
-    image = Image.new("RGB", (SCREEN_WIDTH, SCREEN_HEIGHT), WHITE)
-    draw = ImageDraw.Draw(image)
+    def draw(self):
+        image = Image.new("RGB", (self.screen_width, self.screen_height), WHITE)
+        draw = ImageDraw.Draw(image)
 
-    for i in range(1, BOARD_SIZE):
-        x = CELL_SIZE * i
-        y = CELL_SIZE * i
-        draw.line([(x, 0), (x, SCREEN_HEIGHT)], fill=BLACK)
-        draw.line([(0, y), (SCREEN_WIDTH, y)], fill=BLACK)
+        for i in range(1, self.board_size):
+            x = self.cell_size * i
+            y = self.cell_size * i
+            draw.line([(x, 0), (x, self.screen_height)], fill=BLACK)
+            draw.line([(0, y), (self.screen_width, y)], fill=BLACK)
 
-    pygame_image = pygame.image.fromstring(image.tobytes(), image.size, image.mode)
-    screen.blit(pygame_image, (0, 0))
+        pygame_image = pygame.image.fromstring(image.tobytes(), image.size, image.mode)
 
-def main():
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                running = False
+        return pygame_image
 
-        draw_board()
-        pygame.display.flip()
+class Game:
+    def __init__(self, screen_width, screen_height, board_size):
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+        self.board_size = board_size
+        self.cell_size = screen_width // board_size
+        
+        pygame.init()
+        self.screen = pygame.display.set_mode((screen_width, screen_height))
+        pygame.display.set_caption("Tic Tac Toe")
 
-    pygame.quit()
+        self.board = Board(screen_width, screen_height, board_size, self.cell_size)
+
+    def run(self):
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    running = False
+
+            self.screen.blit(self.board.draw(), (0, 0))
+            pygame.display.flip()
+
+        pygame.quit()
 
 if __name__ == "__main__":
-    main()
+    game = Game(400, 400, 3)
+    game.run()
